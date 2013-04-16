@@ -1,0 +1,3 @@
+This research project will include using the PHP programming language to design and build an administrative interface for a cloud-based educational tool system (COMTOR) and related API system. Both systems store information in Amazon databases as they run, but currently do not have a way to display this stored information to the administrator of the systems. The API system also requires a key. The interface will not only display the database information, but will also manage API keys and keep track of how many keys are in use to determine how many people are using the system.
+
+Deliverables will include a end-of-experience report, a reflective essay on professional development and life long learning, and a poster presentation of this work (as per department standards).
