@@ -1,6 +1,22 @@
 <!DOCTYPE html>
 <html>
-<pre>
+	<div class="navbar">
+		<div class="navbar-inner">
+			<a class="brand" href="#">Navigation</a>
+	      	<ul class="nav">
+	        	<li class ="active"><a href="#">Home</a></li>
+	        	<li><a href="https://github.com/nicel1/admin-inter">GitHub</a></li>
+	        	<li><a href="http://computerscience.pages.tcnj.edu/">TCNJ CompSci</a></li>
+			</ul>
+		</div>
+	</div>
+
+<body>
+<h1>
+	COMTOR Administrative Interface
+</h1>
+
+<!--<pre>-->
 <?php
 
 /*%******************************************************************************************%*/
@@ -15,16 +31,13 @@
 	// Include the SDK
 	require_once './sdk.class.php';
 
-
 /*%******************************************************************************************%*/
-// SELECT DATA FROM DYNAMODB
 
 	// Instantiate
 	$dynamodb = new AmazonDynamoDB();
 	$table_name = 'org.comtor.usage';
- 
-####################################################################
 
+	//Get data from database
 	$response = $dynamodb->query(array(
 	    'TableName'    => $table_name,
 	    'AttributesToGet' => array(
@@ -34,16 +47,19 @@
 	    )
 	));
 
+	//Variables for Access Mechanism data
 	$wwwCount = 0;
 	$apiCount = 0;
 	$eclipseCount = 0;
 	$netbeansCount = 0;
-	$emailCount = 0;
 
-	$emailStr = $response->body->Items;
-	$email1 = json_decode($emailStr->email->to_json())->{'S'};
+	//Variables for email data
+	$emailStrs = array();
+	$emailCounts = array();
+	$i = 0;
 
 	if($response->isOK()) {
+		//Traverse data
 		foreach ($response->body->Items as $xml) {
 			//Access mech stuff
 			$accessString = json_decode($xml->accessMechanism->to_json())->{'S'};
@@ -57,19 +73,25 @@
 				$netbeansCount++;
 
 			//Email stuff
-			$emailStr = $response->body->Items;
-			$email2 = json_decode($emailStr->email->to_json())->{'S'};
-			if($email1 === $email2)
-				$emailCount++;
+			$tempEmail = json_decode($response->body->Items->email->to_json())->{'S'};
+			if (in_array($tempEmail, $emailStrs)) {
+				$emailCounts[$tempEmail]++;
+			}
 			else {
-
+				$emailStrs[$i] = $tempEmail;
+				$emailCounts[$tempEmail] = 1;
+				$i++;
 			}
 		}
 	}
+	else
+		echo "Something went wrong when retrieving data from the database.";
 	
+	//Count total access mech
 	$totalAM = $wwwCount + $apiCount + $eclipseCount + $netbeansCount;
-
 ?>
+
+<br>
 
 <!-- ACCESS MECHANISM TABLE -->
 <table border="1">
@@ -100,55 +122,30 @@
 	</tr>
 </table>
 
+<br><br>
+
 <!-- EMAIL TABLE -->
 <table border="1">
-	<tr>
-		<th>Email</th>
-		<th>Usage Count</th>
-	</tr>
-	<tr>
-		<td><?php echo $email1; ?></td>
-		<td><?php echo $emailCount; ?></td>
-	</tr>
-</table>
 
-	
+<?php
+	echo "<tr>
+			<th>Email</th>
+			<th>Usage Count</th>
+		</tr>";
+	foreach($emailStrs as $email){
+		echo "<td>" . $email . "</td>";
+		echo "<td>" . $emailCounts[$email] . "</td>";
+	}
+?>
+
+</table>
+</body>
+
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-		<title>Access Mechanism Table</title>
-		<!--<link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
-		<link href="css/bootstrap.css" rel="stylesheet" media="screen">-->
+		<title>COMTOR ADMIN INTERFACE</title>
+		<link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
+		<link href="css/bootstrap.css" rel="stylesheet" media="screen">
 		<style type="text/css" media="screen">
-		body {
-			margin: 0;
-			padding: 0;
-			font: 14px/1.5em "Helvetica Neue", "Lucida Grande", Verdana, Arial, sans;
-			background-color: #fff;
-			color: #333;
-		}
-		table {
-			margin: 50px auto 0 auto;
-			padding: 0;
-			border-collapse: collapse;
-		}
-		table th {
-			background-color: #eee;
-		}
-		table td,
-		table th {
-			padding: 5px 10px;
-			border: 1px solid #eee;
-		}
-		table td {
-			border: 1px solid #ccc;
-		}
-		</style>
-		
 	</head>
-	<body>
-		<!-- Display HTML table -->
-		<!-- <?php echo $html; ?> -->
-
-	</body>
-</pre>
 </html>
