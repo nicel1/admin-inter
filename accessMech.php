@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html>
 	<div class="navbar">
+		<div class="navbar-static-top">
 		<div class="navbar-inner">
-			<a class="brand" href="#">Navigation</a>
+			<a class="brand" href="#">COMTOR Admin</a>
 	      	<ul class="nav">
-	        	<li class ="active"><a href="#">Home</a></li>
+	        	<li><a href="http://localhost:8888/COMTOR/index.php">Home</a></li>
+	        	<li class ="active"><a href="http://localhost:8888/COMTOR/accessMech.php">Access Mechanisms</a></li>
+	        	<li><a href="http://localhost:8888/COMTOR/emailAddr.php">Email Addresses</a></li>
+	        	<li><a href="http://localhost:8888/COMTOR/time.php">Time</a></li>
 	        	<li><a href="https://github.com/nicel1/admin-inter">GitHub</a></li>
 	        	<li><a href="http://computerscience.pages.tcnj.edu/">TCNJ CompSci</a></li>
 			</ul>
+			</div>
 		</div>
 	</div>
 
 <body>
 <h1>
-	COMTOR Administrative Interface
+	Usage by Access Mechanism
 </h1>
 
-<!--<pre>-->
 <?php
-
 /*%******************************************************************************************%*/
 // SETUP
 
@@ -38,14 +41,9 @@
 	$table_name = 'org.comtor.usage';
 
 	//Get data from database
-	$response = $dynamodb->query(array(
-	    'TableName'    => $table_name,
-	    'AttributesToGet' => array(
-	    	'datetime', 'webcatUID', 'email', 'ipAddress', 'webcatInstitution', 'accessMechanism'),
-	    'HashKeyValue' => array(
-	        AmazonDynamoDB::TYPE_STRING => 'depasqua@tcnj.edu'
-	    )
-	));
+	$response = $dynamodb->scan(array('TableName' => $table_name, 
+		'AttributesToGet' => array(
+	    	'accessMechanism'),));
 
 	//Variables for Access Mechanism data
 	$wwwCount = 0;
@@ -65,30 +63,39 @@
 			$accessString = json_decode($xml->accessMechanism->to_json())->{'S'};
 			if($accessString === 'www')
 				$wwwCount++;
-			else if($accessString === 'API')
+			else if($accessString === 'api')
 				$apiCount++;
 			else if($accessString === 'eclipse')
 				$eclipseCount++;
 			else if($accessString === 'netbeans')
 				$netbeansCount++;
 
-			//Email stuff
-			$tempEmail = json_decode($response->body->Items->email->to_json())->{'S'};
-			if (in_array($tempEmail, $emailStrs)) {
-				$emailCounts[$tempEmail]++;
-			}
-			else {
-				$emailStrs[$i] = $tempEmail;
-				$emailCounts[$tempEmail] = 1;
-				$i++;
-			}
+			//General data table
+			/*echo "<tr>
+					<th>Date and Time</th>
+					<th>Webcat UID</th>
+					<th>Email Address</th>
+					<th>IP Address</th>
+					<th>Webcat Institution</th>
+					<th>Access Mechanism</th>
+				</tr>";
+			echo "<td>" . $datetime . "</td></table>";*/
 		}
 	}
 	else
-		echo "Something went wrong when retrieving data from the database.";
+		echo "Something went wrong when retrieving data from the database.<br>";
 	
 	//Count total access mech
 	$totalAM = $wwwCount + $apiCount + $eclipseCount + $netbeansCount;
+
+	/*echo '<pre>';
+	var_dump($emailStrs);
+	echo '</pre>';
+
+	echo '<pre>';
+	var_dump($emailCounts);
+	echo '</pre>';*/
+
 ?>
 
 <br>
@@ -103,47 +110,41 @@
 	<tr>
 		<td>www</td>
 		<td><?php echo $wwwCount; ?></td>
-		<td><?php echo $wwwCount/$totalAM*100; ?></td>
+		<td><?php echo round($wwwCount/$totalAM*100, 0); ?></td>
 	</tr>
 	<tr>
 		<td>API</td>
 		<td><?php echo $apiCount; ?></td>
-		<td><?php echo $apiCount/$totalAM*100; ?></td>
+		<td><?php echo round($apiCount/$totalAM*100, 0); ?></td>
 	</tr>
 	<tr>
 		<td>Eclipse</td>
 		<td><?php echo $eclipseCount; ?></td>
-		<td><?php echo $eclipseCount/$totalAM*100; ?></td>
+		<td><?php echo round($eclipseCount/$totalAM*100, 0); ?></td>
 	</tr>
 	<tr>
 		<td>Netbeans</td>
 		<td><?php echo $netbeansCount; ?></td>
-		<td><?php echo $netbeansCount/$totalAM*100; ?></td>
+		<td><?php echo round($netbeansCount/$totalAM*100, 0); ?></td>
 	</tr>
 </table>
 
 <br><br>
 
-<!-- EMAIL TABLE -->
-<table border="1">
-
 <?php
-	echo "<tr>
-			<th>Email</th>
-			<th>Usage Count</th>
-		</tr>";
-	foreach($emailStrs as $email){
-		echo "<td>" . $email . "</td>";
-		echo "<td>" . $emailCounts[$email] . "</td>";
-	}
+	echo '<form action="accessChart.php" method="post">';
+	echo '<input type="hidden" name="www" value="' . round($wwwCount/$totalAM*100, 0) . '">';
+	echo '<input type="hidden" name="api" value="' . round($apiCount/$totalAM*100, 0) . '">';
+	echo '<input type="hidden" name="eclipse" value="' . round($eclipseCount/$totalAM*100, 0) . '">';
+	echo '<input type="hidden" name="netbeans" value="' . round($netbeansCount/$totalAM*100, 0) . '">';
+	echo '<input type="submit" value="See chart"></form>';
 ?>
 
-</table>
 </body>
-
+	<?php //http://bootswatch.com/united/ ?>
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-		<title>COMTOR ADMIN INTERFACE</title>
+		<title>COMTOR Admin Interface</title>
 		<link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
 		<link href="css/bootstrap.css" rel="stylesheet" media="screen">
 		<style type="text/css" media="screen">

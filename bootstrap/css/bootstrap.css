@@ -71,6 +71,7 @@ html {
   font-size: 100%;
   -webkit-text-size-adjust: 100%;
       -ms-text-size-adjust: 100%;
+
 }
 
 a:focus {
@@ -2006,10 +2007,12 @@ table {
 .table {
   width: 100%;
   margin-bottom: 20px;
+  margin-left: 20px;
 }
 
 .table th,
 .table td {
+  margin-left: 20px;
   padding: 8px;
   line-height: 20px;
   text-align: left;
