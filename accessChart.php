@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <div class="navbar">
     <div class="navbar-static-top">
@@ -17,13 +18,14 @@
 
   <head>
     <?php
+      //Get variables from last accessMech.php
       $www = $_POST['www'];
       $api = $_POST['api'];
       $eclipse = $_POST['eclipse'];
       $netbeans = $_POST['netbeans'];
     ?>
 
-
+    <!--This is all Google Charts stuff -->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
       google.load("visualization", "1", {packages:["corechart"]});

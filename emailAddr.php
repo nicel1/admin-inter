@@ -44,11 +44,6 @@
 	$response = $dynamodb->scan(array('TableName' => $table_name, 
 		'AttributesToGet' => array('email')));
 
-	//Not permanent
-	//For when not all of the data comes through
-	//Not working currently
-	$nextHash = json_decode($response->body->Items->LastEvaluatedKey->HashKeyElement);
-
 	//Variables for email data
 	$emailStrs = array();
 	$emailCounts = array();
@@ -81,6 +76,7 @@
 			$j++;	//get ready to get next item from database
 		}
 		
+		//Debugging in case my logic is flawed
 		if($numItems != $numItemsDB) {
 			echo 'The number of items is not correct.<br>';
 			echo '$numItems = ' . $numItems . '<br>';
@@ -89,12 +85,12 @@
 	}
 	else
 		echo "Something went wrong when retrieving data from the database.<br>";
-
 ?>
 
 <br>
 
-<!-- EMAIL TABLE -->
+</body>
+<head>
 <table border="1">
 <?php
 	//Table headers
@@ -111,24 +107,49 @@
 	}
 	echo '</table><br>';
 
-	//Go to table 'form'
-	echo '<form action="emailChart.php" method="post">';
-	echo '<input type="hidden" name="email0" value="' . $emailStrs[0] . '">';
-	echo '<input type="hidden" name="email1" value="' . $emailStrs[1] . '">';
-	echo '<input type="hidden" name="email2" value="' . $emailStrs[2] . '">';
-	echo '<input type="hidden" name="count0" value="' . $emailCounts[0] . '">';
-	echo '<input type="hidden" name="count1" value="' . $emailCounts[1] . '">';
-	echo '<input type="hidden" name="count2" value="' . $emailCounts[2] . '">';
-	echo '<input type="submit" value="See chart"></form>';
-?>
 
-</body>
-	<?php //http://bootswatch.com/united/ ?>
-	<head>
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-		<title>COMTOR Admin Interface</title>
-		<link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
-		<link href="css/bootstrap.css" rel="stylesheet" media="screen">
-		<style type="text/css" media="screen">
-	</head>
+
+	$a = 0;
+	
+	//This is all Google Charts stuff
+    echo '<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    	<script type="text/javascript">
+    	google.load("visualization", "1", {packages:["corechart"]});
+    	';
+    echo "google.setOnLoadCallback(drawChart);
+    	";
+    echo "function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Email Address', 'Times Used'],
+          ";
+
+        foreach($emailStrs as $email) {
+	        echo "['"; 
+	        echo $emailStrs[$a]; 
+	        echo "', "; 
+	        echo $emailCounts[$emailStrs[$a]]; 
+	        echo "],
+	        ";
+	        $a++;
+		}
+        echo "]);
+
+        var options = {
+          title: 'Users',
+          vAxis: {title: 'Email Address',  titleTextStyle: {color: 'blue'}}
+        };
+
+        var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+    ";
+    ?>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>COMTOR Admin Interface</title>
+	<link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
+	<link href="css/bootstrap.css" rel="stylesheet" media="screen">
+	<style type="text/css" media="screen">
+</head>
 </html>
