@@ -146,8 +146,10 @@
 <br>
 
 <!-- EMAIL TABLE -->
-<table border="1">
 <?php
+	//TABLE
+	//Not necessary since graph works, but kept here in comments in case it's ever needed again
+	/*echo '<table border="1">';
 	echo "<tr>
 			<th>Hour</th>
 			<th>Usage (%)</th>
@@ -158,24 +160,50 @@
 		echo "<td>" . round($hourCounts[$hour]/24*100, 0);
 		echo "</tr>";
 	}
-	echo '</table><br>';
+	echo '</table>';*/
 
-	echo '<form action="hourChart.php" method="post">';
-	foreach ($hourArray as $hour) {
-		echo '<input type="hidden" name="hours[]" value="' . $hour . '">';
-	}
-	echo '<input type="submit" value="See chart"></form>';
-?>
+	//Variable to traverse arrays
+	$a = 0;
+	
+	//This is all Google Charts stuff
+    echo '<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    	<script type="text/javascript">
+    	google.load("visualization", "1", {packages:["corechart"]});
+    	';
+    echo "google.setOnLoadCallback(drawChart);
+    	";
+    echo "function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Hour', 'Users'],
+          ";
 
-<br>
+        foreach($hourArray as $hour) {
+	        echo "['"; 
+	        echo $hour; 
+	        echo "', "; 
+	        echo $hourCounts[$hour]; 
+	        echo "],
+	        ";
+	        $a++;
+		}
+        echo "]);
 
-</body>
-	<?php //http://bootswatch.com/united/ ?>
-	<head>
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-		<title>COMTOR Admin Interface</title>
-		<link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
-		<link href="css/bootstrap.css" rel="stylesheet" media="screen">
-		<style type="text/css" media="screen">
-	</head>
+        var options = {
+          title: '',
+          vAxis: {title: 'Hour of the Day',  titleTextStyle: {color: 'orange'}}
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+    ";
+    ?>
+    <div id="chart_div" style="width: 1400px; height: 600px;"></div>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>COMTOR Admin Interface</title>
+	<link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
+	<link href="css/bootstrap.css" rel="stylesheet" media="screen">
+	<style type="text/css" media="screen">
+</head>
 </html>

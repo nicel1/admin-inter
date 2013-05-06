@@ -91,9 +91,11 @@
 
 </body>
 <head>
-<table border="1">
+
 <?php
-	//Table headers
+	//TABLE
+	//Not necessary since graph works, but kept here in comments in case it's ever needed again
+	/*echo '<table border="1">';
 	echo "<tr>
 			<th>Email Address</th>
 			<th>Usage Count</th>
@@ -105,7 +107,7 @@
 		echo "<td>" . $emailCounts[$email] . "</td>";
 		echo "</tr>";
 	}
-	echo '</table><br>';
+	echo '</table><br>';*/
 
 
 

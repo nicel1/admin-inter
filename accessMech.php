@@ -100,7 +100,8 @@
 
 <br>
 
-<!-- ACCESS MECHANISM TABLE -->
+<!-- ACCESS MECHANISM TABLE 
+Not necessary since graph works, but kept here in comments in case it's ever needed again
 <table border="1">
 	<tr>
 		<th>Access Mechanism</th>
@@ -127,26 +128,41 @@
 		<td><?php echo $netbeansCount; ?></td>
 		<td><?php echo round($netbeansCount/$totalAM*100, 0); ?></td>
 	</tr>
-</table>
-
-<br><br>
+</table>-->
 
 <?php
-	echo '<form action="accessChart.php" method="post">';
-	echo '<input type="hidden" name="www" value="' . round($wwwCount/$totalAM*100, 0) . '">';
-	echo '<input type="hidden" name="api" value="' . round($apiCount/$totalAM*100, 0) . '">';
-	echo '<input type="hidden" name="eclipse" value="' . round($eclipseCount/$totalAM*100, 0) . '">';
-	echo '<input type="hidden" name="netbeans" value="' . round($netbeansCount/$totalAM*100, 0) . '">';
-	echo '<input type="submit" value="See chart"></form>';
-?>
 
-</body>
-	<?php //http://bootswatch.com/united/ ?>
-	<head>
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-		<title>COMTOR Admin Interface</title>
-		<link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
-		<link href="css/bootstrap.css" rel="stylesheet" media="screen">
-		<style type="text/css" media="screen">
-	</head>
+	//This is all Google Charts stuff
+    echo '<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    	<script type="text/javascript">
+    	google.load("visualization", "1", {packages:["corechart"]});
+    	';
+    echo "google.setOnLoadCallback(drawChart);
+    	";
+    echo "function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['accessMechanism', '% of total use'],
+          ['www',      " . $wwwCount . "],
+          ['API',      " . $apiCount . "],
+          ['Eclipse',  " . $eclipseCount . "],
+          ['Netbeans', " . $netbeansCount . "]
+          ]);
+
+        var options = {
+          title: ''
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+    ";
+    ?>
+    <div id="chart_div" style="width: 1400px; height: 600px;"></div>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>COMTOR Admin Interface</title>
+	<link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
+	<link href="css/bootstrap.css" rel="stylesheet" media="screen">
+	<style type="text/css" media="screen">
+</head>
 </html>

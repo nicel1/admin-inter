@@ -23,9 +23,6 @@
 
 Welcome to COMTOR's Administrative Interface!
 
-<?php
-
-?>
 </body>
 	<?php //http://bootswatch.com/united/ ?>
 	<head>
